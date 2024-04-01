@@ -42,6 +42,22 @@ def get_delay_arr_p_deb(data):
         delay_sum += (rt_dep_ts - sched_dep_ts)
     return delay_sum
 
+def longest_delay(data):
+    longest_time = datetime.timedelta(seconds=0)
+    delay_data = None
+    delay_ts = None
+    for ride in data:
+        rt_arr_ts = datetime.datetime.fromtimestamp(ride["rt_arr_ts"])
+        sched_arr_ts = datetime.datetime.fromtimestamp(ride["sched_arr_ts"])
+        app_delay = (rt_arr_ts - sched_arr_ts)
+        if longest_time > app_delay:
+            continue
+        else:
+            longest_time = app_delay
+            delay_data = [ride["type"], ride["line"], ride["id"]]
+            delay_ts = sched_arr_ts
+    return longest_time, delay_data, delay_ts
+
 def main():
     filename = "input-data/history.json"
     with open(filename, encoding="utf-8") as f:
@@ -52,6 +68,8 @@ def main():
     print(f"Erste Fahrt: {get_first_timestamp(data)}")
     print(f"Gefahrene Linien: {get_lines(data)}")
     print(f"Verspätung gesammelt (Verspätung Abfahrt + Verspätung Ankunft): {get_delay_arr_p_deb(data)}")
+    delay_time, delay_data, delay_ts = longest_delay(data)
+    print("Größte Einzelverspätung:", *delay_data, delay_ts, delay_time)
 
 if __name__ == "__main__":
     main()
